@@ -9,6 +9,7 @@ import prompts from "prompts";
 import { getProjectInfo } from "@/src/utils/get-project-info";
 import { handleError } from "@/src/utils/handle-error";
 import { logger } from "@/src/utils/logger";
+import { generateDocs } from "@/src/utils/generate-docs";
 
 const initOptionsSchema = z.object({
   cwd: z.string(),
@@ -64,5 +65,12 @@ export async function runInit(
   infoSpinner?.succeed();
   logger.info("");
 
-  logger.info(JSON.stringify(info));
+  // Generate docs object  
+  const generateSpinner = ora(`Generating docs`)?.start();
+  const docs = generateDocs(cwd, info.language);
+
+  if (!docs) throw new Error("Couldn't generate docs");
+
+  generateSpinner?.succeed();
+  logger.info("");
 }

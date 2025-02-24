@@ -1,6 +1,8 @@
+import { createFile } from "./create-file";
 import { getFiles } from "./get-files";
 import { Language } from "./get-project-info";
 import { z } from "zod";
+import path from "path";
 
 export const FunctionSchema = z.object({
   name: z.string(),
@@ -45,23 +47,89 @@ export const DirectorySchema: z.ZodType<{ path: string; files: FileType[]; child
 export type FunctionType = z.infer<typeof FunctionSchema>;
 export type FileType = z.infer<typeof FileSchema>;
 export type DirectoryType = z.infer<typeof DirectorySchema>;
-
-export function generateDocs(cwd: string, language: Language) {
-  if (language === "py")
-    return generatePyDocs(cwd);
-  else {
-    return generateJsDocs(cwd, language);
-  }
+export type Markdown = {
+  filename: string;
+  filePath: string;
+  content: string;
 }
 
-export function generatePyDocs(cwd: string) {
-  return getFiles(cwd, ".py");
+function generateFunctionMarkdown(func: FunctionType): string {
+  let markdownContent = `\n\n## ${func.name}\n\n`;
+
+  // Add parameters documentation
+  if (func.params.length > 0) {
+    markdownContent += "### Parameters:\n";
+    markdownContent += "| Name | Type | Description |\n";
+    markdownContent += "| ---- | ---- | ----------- |\n";
+    for (const param of func.params) {
+      markdownContent += `| ${param.name} | ${param.type} | ${param.description || ''} |\n`;
+    }
+    markdownContent += "\n";
+  }
+
+  // Add returns documentation
+  if (func.returns) {
+    markdownContent += "### Returns:\n";
+    markdownContent += `- **Type**: ${func.returns.type}\n`;
+    markdownContent += `- **Description**: ${func.returns.description || ''}\n\n`;
+  }
+
+  // Add throws documentation
+  if (func.throws && func.throws.length > 0) {
+    markdownContent += "### Throws:\n";
+    markdownContent += "| Type | Description |\n";
+    markdownContent += "| ---- | ----------- |\n";
+    for (const error of func.throws) {
+      markdownContent += `| ${error.type} | ${error.description || ''} |\n`;
+    }
+    markdownContent += "\n";
+  }
+
+  markdownContent += "---\n\n";
+
+  return markdownContent;
 }
 
-export function generateJsDocs(cwd: string, language: Language) {
-  if (language === "ts") {
-    return getFiles(cwd, ".ts");
-  } else {
-    return getFiles(cwd, ".js");
+function generateMarkdown(directory: DirectoryType): Markdown[] {
+  const markdown: Markdown[] = [];
+
+  // Process all files in the current directory
+  for (const file of directory.files) {
+    let filePath = file.path.split("\\");
+    let filename = filePath.pop()?.replace(/\.[^/.]+$/, "") + ".md";
+
+    let content = `# ${filename.replace(".md", "")}`;
+    for (const func of file.functions) {
+      content += generateFunctionMarkdown(func);
+    }
+
+
+    markdown.push({
+      filePath: filePath.join("/"),
+      filename,
+      content,
+    })
   }
+
+  // Recursively process child directories
+  for (const child of directory.children) {
+    markdown.push(...generateMarkdown(child));
+  }
+
+  return markdown;
+}
+
+export async function generateDocs(cwd: string, language: Language) {
+  const files: DirectoryType = getFiles(cwd, language);
+  const markdown = generateMarkdown(files);
+
+  for (const { filePath, content, filename } of markdown) {
+    await createFile(
+      filename,
+      content,
+      path.join(cwd, "docs", filePath)
+    );
+  }
+
+  return markdown;
 }
