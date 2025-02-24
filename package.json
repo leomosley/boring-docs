@@ -30,7 +30,8 @@
     "pub:next": "pnpm build && pnpm publish --no-git-checks --access public --tag next",
     "pub:release": "pnpm build && pnpm publish --access public",
     "test:py": "node dist/index.js init --cwd ./.test/py-app",
-    "tes:ts": "node dist/index.js init --cwd ./.test/ts-app"
+    "test:ts": "node dist/index.js init --cwd ./.test/ts-app",
+    "test:js": "node dist/index.js init --cwd ./.test/js-app"
   },
   "dependencies": {
     "@antfu/ni": "^0.21.4",
