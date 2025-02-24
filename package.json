@@ -29,7 +29,8 @@
     "pub:beta": "pnpm build && pnpm publish --no-git-checks --access public --tag beta",
     "pub:next": "pnpm build && pnpm publish --no-git-checks --access public --tag next",
     "pub:release": "pnpm build && pnpm publish --access public",
-    "test": "node dist/index.js init --cwd ./test-app"
+    "test:py": "node dist/index.js init --cwd ./.test/py-app",
+    "tes:ts": "node dist/index.js init --cwd ./.test/ts-app"
   },
   "dependencies": {
     "@antfu/ni": "^0.21.4",
@@ -49,6 +50,7 @@
     "ora": "^6.1.2",
     "prompts": "^2.4.2",
     "recast": "^0.23.2",
+    "toml": "^3.0.0",
     "ts-morph": "^18.0.0",
     "tsconfig-paths": "^4.2.0",
     "zod": "^3.20.2"
