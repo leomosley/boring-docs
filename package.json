@@ -31,7 +31,8 @@
     "pub:release": "pnpm build && pnpm publish --access public",
     "test:py": "rm -rf ./.test/py-app/docs && node dist/index.js init --cwd ./.test/py-app",
     "test:ts": "rm -rf ./.test/ts-app/docs && node dist/index.js init --cwd ./.test/ts-app",
-    "test:js": "rm -rf ./.test/js-app/docs && node dist/index.js init --cwd ./.test/js-app"
+    "test:js": "rm -rf ./.test/js-app/docs && node dist/index.js init --cwd ./.test/js-app",
+    "prepare": "husky"
   },
   "dependencies": {
     "@antfu/ni": "^0.21.4",
@@ -62,6 +63,7 @@
     "@types/fs-extra": "^11.0.1",
     "@types/lodash": "^4.17.7",
     "@types/prompts": "^2.4.2",
+    "husky": "^9.1.7",
     "rimraf": "^4.1.3",
     "tsup": "^6.6.3",
     "type-fest": "^3.8.0",

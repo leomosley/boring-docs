@@ -7,7 +7,7 @@ import { z } from "zod";
 
 export function handleError(error: unknown) {
   logger.error(
-    `Something went wrong. Please check the error below for more details.`
+    `Something went wrong. Please check the error below for more details.`,
   );
   logger.error(`If the problem persists, please open an issue on GitHub.`);
   logger.error("");

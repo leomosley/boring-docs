@@ -23,7 +23,7 @@ export const init = new Command()
   .option(
     "-c, --cwd <cwd>",
     "the working directory. defaults to the current directory.",
-    process.cwd()
+    process.cwd(),
   )
   .option("-y, --yes", "skip confirmation prompt.", false)
   .option("-e, --example", "add example uploader", false)
@@ -40,9 +40,7 @@ export const init = new Command()
       await runInit(options, cwd);
 
       logger.info(
-        `${chalk.green(
-          "Success!"
-        )} Project initialization completed.`
+        `${chalk.green("Success!")} Project initialization completed.`,
       );
       logger.info("");
     } catch (error) {
@@ -52,9 +50,9 @@ export const init = new Command()
 
 export async function runInit(
   options: z.infer<typeof initOptionsSchema> & {
-    skipPreflight?: boolean
+    skipPreflight?: boolean;
   },
-  cwd: string
+  cwd: string,
 ) {
   // Get project info
   const infoSpinner = ora(`Getting project information`)?.start();
@@ -65,7 +63,7 @@ export async function runInit(
   infoSpinner?.succeed();
   logger.info("");
 
-  // Generate docs object  
+  // Generate docs object
   const generateSpinner = ora(`Generating docs`)?.start();
   const docs = generateDocs(cwd, info.language);
 

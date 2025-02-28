@@ -11,7 +11,7 @@ export const FunctionSchema = z.object({
       name: z.string(),
       type: z.string(),
       description: z.string().optional(),
-    })
+    }),
   ),
   returns: z
     .object({
@@ -24,7 +24,7 @@ export const FunctionSchema = z.object({
       z.object({
         type: z.string(),
         description: z.string().optional(),
-      })
+      }),
     )
     .optional(),
   docstring: z.string().optional(),
@@ -36,12 +36,16 @@ export const FileSchema = z.object({
   content: z.string(),
 });
 
-export const DirectorySchema: z.ZodType<{ path: string; files: FileType[]; children: DirectoryType[] }> = z.lazy(() =>
+export const DirectorySchema: z.ZodType<{
+  path: string;
+  files: FileType[];
+  children: DirectoryType[];
+}> = z.lazy(() =>
   z.object({
     path: z.string(),
     files: z.array(FileSchema),
     children: z.array(DirectorySchema),
-  })
+  }),
 );
 
 export type FunctionType = z.infer<typeof FunctionSchema>;
@@ -51,7 +55,7 @@ export type Markdown = {
   filename: string;
   filePath: string;
   content: string;
-}
+};
 
 function generateFunctionMarkdown(func: FunctionType): string {
   let markdownContent = `\n\n## ${func.name}\n\n`;
@@ -62,7 +66,7 @@ function generateFunctionMarkdown(func: FunctionType): string {
     markdownContent += "| Name | Type | Description |\n";
     markdownContent += "| ---- | ---- | ----------- |\n";
     for (const param of func.params) {
-      markdownContent += `| ${param.name} | ${param.type} | ${param.description || ''} |\n`;
+      markdownContent += `| ${param.name} | ${param.type} | ${param.description || ""} |\n`;
     }
     markdownContent += "\n";
   }
@@ -71,7 +75,7 @@ function generateFunctionMarkdown(func: FunctionType): string {
   if (func.returns) {
     markdownContent += "### Returns:\n";
     markdownContent += `- **Type**: ${func.returns.type}\n`;
-    markdownContent += `- **Description**: ${func.returns.description || ''}\n\n`;
+    markdownContent += `- **Description**: ${func.returns.description || ""}\n\n`;
   }
 
   // Add throws documentation
@@ -80,7 +84,7 @@ function generateFunctionMarkdown(func: FunctionType): string {
     markdownContent += "| Type | Description |\n";
     markdownContent += "| ---- | ----------- |\n";
     for (const error of func.throws) {
-      markdownContent += `| ${error.type} | ${error.description || ''} |\n`;
+      markdownContent += `| ${error.type} | ${error.description || ""} |\n`;
     }
     markdownContent += "\n";
   }
@@ -103,12 +107,11 @@ function generateMarkdown(directory: DirectoryType): Markdown[] {
       content += generateFunctionMarkdown(func);
     }
 
-
     markdown.push({
       filePath: filePath.join("/"),
       filename,
       content,
-    })
+    });
   }
 
   // Recursively process child directories
@@ -124,11 +127,7 @@ export async function generateDocs(cwd: string, language: Language) {
   const markdown = generateMarkdown(files);
 
   for (const { filePath, content, filename } of markdown) {
-    await createFile(
-      filename,
-      content,
-      path.join(cwd, "docs", filePath)
-    );
+    await createFile(filename, content, path.join(cwd, "docs", filePath));
   }
 
   return markdown;

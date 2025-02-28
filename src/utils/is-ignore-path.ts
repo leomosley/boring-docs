@@ -20,12 +20,14 @@ export const IGNORE = [
   ".pytest_cache",
   "tsconfig.tsbuildinfo",
   ".gitlab-ci.yml",
-  ".github"
+  ".github",
 ];
 
 export function isIgnorePath(filePath: string): boolean {
-  return IGNORE.some(ignorePath => {
+  return IGNORE.some((ignorePath) => {
     const normalizedIgnorePath = path.sep + ignorePath;
-    return filePath.includes(normalizedIgnorePath) || filePath.endsWith(ignorePath);
+    return (
+      filePath.includes(normalizedIgnorePath) || filePath.endsWith(ignorePath)
+    );
   });
 }

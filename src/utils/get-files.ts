@@ -14,7 +14,11 @@ export function getFiles(dir: string, extension: string): DirectoryType {
   return result;
 }
 
-export function readDirectoryRecursive(dir: string, extension: string, baseDir: string): DirectoryType | null {
+export function readDirectoryRecursive(
+  dir: string,
+  extension: string,
+  baseDir: string,
+): DirectoryType | null {
   if (isIgnorePath(dir)) return null;
 
   const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -30,7 +34,6 @@ export function readDirectoryRecursive(dir: string, extension: string, baseDir: 
     if (entry.isDirectory()) {
       const result = readDirectoryRecursive(fullPath, ext, baseDir);
       if (result) children.push(result);
-
     } else if (entry.isFile() && fullPath.endsWith(ext)) {
       const content = fs.readFileSync(fullPath, "utf-8");
 

@@ -4,7 +4,7 @@ import fs from "fs-extra";
 export async function createFile(
   filename: string,
   content: string,
-  dir?: string
+  dir?: string,
 ) {
   const filePath = path.join(dir ?? "", filename);
 
@@ -20,4 +20,5 @@ export async function createFile(
   } catch (error) {
     console.error(error);
   }
+
 }

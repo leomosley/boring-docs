@@ -5,11 +5,7 @@ import path from "path";
 import fs from "fs-extra";
 import { getPackageJson, getPyProjectToml } from "./get-package-info";
 
-export const LANGUAGES = [
-  "ts",
-  "js",
-  "py",
-] as const;
+export const LANGUAGES = ["ts", "js", "py"] as const;
 
 export type Language = (typeof LANGUAGES)[number];
 
@@ -55,8 +51,8 @@ export function getProjectInfo(cwd: string): ProjectInfo | null {
       language: "py",
       name: pyProjectToml?.name,
       description: pyProjectToml?.description,
-      license: pyProjectToml?.license as License
-    }
+      license: pyProjectToml?.license as License,
+    };
   }
 
   if (js || ts) {
@@ -66,10 +62,9 @@ export function getProjectInfo(cwd: string): ProjectInfo | null {
       language: ts ? "ts" : "js",
       name: packageJson?.name,
       description: packageJson?.description,
-      license: packageJson?.license as License
-    }
+      license: packageJson?.license as License,
+    };
   }
-
 
   return null;
 }

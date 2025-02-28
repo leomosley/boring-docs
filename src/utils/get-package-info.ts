@@ -14,10 +14,9 @@ export type PyProject = {
   authors?: string[];
 };
 
-
 export function getPackageJson(
   cwd: string = "",
-  shouldThrow: boolean = true
+  shouldThrow: boolean = true,
 ): PackageJson | null {
   const packageJsonPath = path.join(cwd, "package.json");
 
@@ -26,9 +25,7 @@ export function getPackageJson(
   }) as PackageJson;
 }
 
-export function getPyProjectToml(
-  cwd: string = "",
-): PyProject | null {
+export function getPyProjectToml(cwd: string = ""): PyProject | null {
   const pyprojectTomlPath = path.join(cwd, "pyproject.toml");
 
   const pyprojectContent = fs.readFileSync(pyprojectTomlPath, "utf-8");
