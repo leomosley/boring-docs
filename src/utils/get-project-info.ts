@@ -41,29 +41,6 @@ export type ProjectInfo = {
   license?: License;
 };
 
-export const PROJECT_SHARED_IGNORE = [
-  "**/node_modules/**",
-  "**/dist/**",
-  "**/build/**",
-  "**/out/**",
-  "**/coverage/**",
-  "**/.git/**",
-  "**/.next/**",
-  "**/.vscode/**",
-  "**/.idea/**",
-  "**/.DS_Store/**",
-  "**/.env*",
-  "**/*.log",
-  "**/__pycache__/**",
-  "**/*.pyc",
-  "**/venv/**",
-  "**/.mypy_cache/**",
-  "**/.pytest_cache/**",
-  "**/tsconfig.tsbuildinfo",
-  "**/.gitlab-ci.yml",
-  "**/.github/**"
-];
-
 export function getProjectInfo(cwd: string): ProjectInfo | null {
   const { js, ts, py } = {
     js: isJavaScriptProject(cwd),
