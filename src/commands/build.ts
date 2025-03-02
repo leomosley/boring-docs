@@ -2,7 +2,6 @@ import fs from "fs-extra";
 import path from "path";
 import chalk from "chalk";
 import { Command } from "commander";
-import { execa } from "execa";
 import ora from "ora";
 import { z } from "zod";
 import prompts from "prompts";
@@ -11,15 +10,15 @@ import { handleError } from "@/src/utils/handle-error";
 import { logger } from "@/src/utils/logger";
 import { generateDocs } from "@/src/utils/generate-docs";
 
-const initOptionsSchema = z.object({
+const buildOptionsSchema = z.object({
   cwd: z.string(),
   yes: z.boolean(),
   example: z.boolean(),
 });
 
-export const init = new Command()
-  .name("init")
-  .description("")
+export const build = new Command()
+  .name("build")
+  .description("builds the documentation for your project.")
   .option(
     "-c, --cwd <cwd>",
     "the working directory. defaults to the current directory.",
@@ -29,7 +28,7 @@ export const init = new Command()
   .option("-e, --example", "add example uploader", false)
   .action(async (opts) => {
     try {
-      const options = initOptionsSchema.parse(opts);
+      const options = buildOptionsSchema.parse(opts);
       const cwd = path.resolve(options.cwd);
 
       if (!fs.existsSync(cwd)) {
@@ -49,7 +48,7 @@ export const init = new Command()
   });
 
 export async function runInit(
-  options: z.infer<typeof initOptionsSchema> & {
+  options: z.infer<typeof buildOptionsSchema> & {
     skipPreflight?: boolean;
   },
   cwd: string,
