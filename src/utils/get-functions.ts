@@ -1,5 +1,12 @@
 import { FunctionType } from "./generate-docs";
 
+export function cleanString(str: string) {
+  if (!str) return;
+  str = str.replace(/[\r\n]+/g, " ");  // Strip \n and \r
+  str = str.replace(/^[\s\-*]+|[\s\-*]+$/g, ""); // Strip leading/trailing spaces, hyphens, and asterisks
+  return str;
+}
+
 export function getFunctions(
   content: string,
   extension: string,
@@ -20,9 +27,10 @@ export function getFunctions(
   const functions: FunctionType[] = [];
 
   // Process matches and populate the functions array
-  matches.forEach((match) => {
+  for (const match of matches) {
     if (extension === ".ts" || extension === ".js") {
-      const docstring = match[1]?.trim() || "";
+      let docstring = match[1]?.trim() || "";
+
       // Handle different function declaration formats
       const name = match[4] || match[7] || match[11] || match[15] || "";
       const paramsString = match[5] || match[9] || match[13] || match[17] || "";
@@ -35,6 +43,7 @@ export function getFunctions(
 
         functions.push({
           name,
+          description: parsedDocstring.description,
           params: parseJSParams(paramsString, parsedDocstring.params),
           returns: {
             type: returnType,
@@ -45,8 +54,8 @@ export function getFunctions(
         });
       }
     } else if (extension === ".py") {
-      // For Python, handle either single or triple quoted docstrings
-      const docstring = (match[1] || match[2] || "").trim();
+      let docstring = (match[1] || match[2] || "").trim();
+      docstring = docstring.replace(/[\r\n]+/g, " "); // Strip \n and \r
       const name = match[4] || "";
       const paramsString = match[5] || "";
       const returnType = match[6] || "any";
@@ -57,6 +66,7 @@ export function getFunctions(
 
         functions.push({
           name,
+          description: parsedDocstring.description,
           params: parsePythonParams(paramsString, parsedDocstring.params),
           returns: {
             type: returnType,
@@ -67,16 +77,23 @@ export function getFunctions(
         });
       }
     }
-  });
+  };
 
   return functions;
 }
 
 // Function to parse JSDoc-style docstrings
 export function parseJSDocstring(docstring: string) {
+  let description = "";
   const params: Record<string, string> = {};
   let returns = "";
   const throws: Array<{ type: string; description: string }> = [];
+
+  // Extract description
+  const descMatch = docstring.match(/^([\s\S]*?)(?=@param|@returns|@throws|\n\s*\n|$)/);
+  if (descMatch) {
+    description = cleanString(descMatch[1]) ?? "";
+  }
 
   // Extract @param annotations
   const paramMatches = docstring.matchAll(
@@ -110,18 +127,25 @@ export function parseJSDocstring(docstring: string) {
 
     throws.push({
       type: throwType,
-      description: throwDesc,
+      description: cleanString(throwDesc) ?? "",
     });
   }
 
-  return { params, returns, throws };
+  return { description, params, returns, throws };
 }
 
 // Function to parse Python docstrings (supports Google style, NumPy style, and reST)
 export function parsePythonDocstring(docstring: string) {
+  let description = "";
   const params: Record<string, string> = {};
   let returns = "";
   const throws: Array<{ type: string; description: string }> = [];
+
+  // Extract description (text before the first section)
+  const descMatch = docstring.match(/^([\s\S]*?)(?=Args:|Parameters:|Returns:|Raises:|Yields:|Examples:|$)/i);
+  if (descMatch) {
+    description = cleanString(descMatch[1]) ?? "";
+  }
 
   // Look for Parameters section (Google style)
   const paramSection = docstring.match(
@@ -149,7 +173,7 @@ export function parsePythonDocstring(docstring: string) {
 
     // Save the last param
     if (currentParam) {
-      params[currentParam] = currentDesc.trim();
+      params[currentParam] = cleanString(currentDesc) ?? "";
     }
   }
 
@@ -177,7 +201,7 @@ export function parsePythonDocstring(docstring: string) {
         if (currentEx) {
           throws.push({
             type: currentEx,
-            description: currentDesc.trim(),
+            description: cleanString(currentDesc) ?? "",
           });
         }
         currentEx = exMatch[1];
@@ -192,12 +216,12 @@ export function parsePythonDocstring(docstring: string) {
     if (currentEx) {
       throws.push({
         type: currentEx,
-        description: currentDesc.trim(),
+        description: cleanString(currentDesc) ?? "",
       });
     }
   }
 
-  return { params, returns, throws };
+  return { description, params, returns, throws };
 }
 
 // Parse JS/TS parameters with their types and merge with extracted descriptions
@@ -226,7 +250,7 @@ export function parseJSParams(
     return {
       name,
       type,
-      description: paramDescriptions[name] || "",
+      description: cleanString(paramDescriptions[name]) ?? "",
     };
   });
 }
@@ -267,12 +291,12 @@ function parsePythonParams(
       return {
         name,
         type,
-        description: paramDescriptions[name] || "",
+        description: cleanString(paramDescriptions[name]) ?? "",
       };
     })
     .filter(Boolean) as Array<{
-    name: string;
-    type: string;
-    description: string;
-  }>;
+      name: string;
+      type: string;
+      description: string;
+    }>;
 }

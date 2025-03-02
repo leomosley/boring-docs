@@ -6,6 +6,7 @@ import path from "path";
 
 export const FunctionSchema = z.object({
   name: z.string(),
+  description: z.string().optional(),
   params: z.array(
     z.object({
       name: z.string(),
@@ -58,7 +59,11 @@ export type Markdown = {
 };
 
 function generateFunctionMarkdown(func: FunctionType): string {
-  let markdownContent = `\n\n## ${func.name}\n\n`;
+  let markdownContent = `\n\n## <code>${func.name}</code>\n\n`;
+
+  if (func.description && func.description.length > 0) {
+    markdownContent += `${func.description}\n\n`;
+  }
 
   // Add parameters documentation
   if (func.params.length > 0) {
@@ -66,7 +71,7 @@ function generateFunctionMarkdown(func: FunctionType): string {
     markdownContent += "| Name | Type | Description |\n";
     markdownContent += "| ---- | ---- | ----------- |\n";
     for (const param of func.params) {
-      markdownContent += `| ${param.name} | ${param.type} | ${param.description || ""} |\n`;
+      markdownContent += `| ${param.name} | ${param.type} | ${param.description ?? ""} |\n`;
     }
     markdownContent += "\n";
   }
@@ -75,7 +80,7 @@ function generateFunctionMarkdown(func: FunctionType): string {
   if (func.returns) {
     markdownContent += "### Returns:\n";
     markdownContent += `- **Type**: ${func.returns.type}\n`;
-    markdownContent += `- **Description**: ${func.returns.description || ""}\n\n`;
+    markdownContent += `- **Description**: ${func.returns.description ?? ""}\n\n`;
   }
 
   // Add throws documentation
@@ -84,7 +89,7 @@ function generateFunctionMarkdown(func: FunctionType): string {
     markdownContent += "| Type | Description |\n";
     markdownContent += "| ---- | ----------- |\n";
     for (const error of func.throws) {
-      markdownContent += `| ${error.type} | ${error.description || ""} |\n`;
+      markdownContent += `| ${error.type} | ${error.description ?? ""} |\n`;
     }
     markdownContent += "\n";
   }
