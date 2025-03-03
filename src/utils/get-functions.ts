@@ -168,7 +168,6 @@ export function getFunctions(
 
   for (const match of matches) {
     const parsed = parseMatch(match, extension);
-    console.log(parsed);
     if (parsed) functions.push(parsed);
   }
 
