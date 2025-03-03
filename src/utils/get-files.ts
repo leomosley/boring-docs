@@ -1,8 +1,8 @@
 import fs from "fs";
 import path from "path";
 import { DirectoryType, FileType } from "./generate-docs";
-import { getFunctions } from "./get-functions";
 import { isIgnorePath } from "./is-ignore-path";
+import { getFunctions } from "./get-functions";
 
 export function getFiles(dir: string, extension: string): DirectoryType {
   const result = readDirectoryRecursive(dir, extension, dir);

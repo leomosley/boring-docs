@@ -14,11 +14,11 @@ export const FunctionSchema = z.object({
       description: z.string().optional(),
     }),
   ),
-  returns: z
-    .object({
+  returns: z.array(
+    z.object({
       type: z.string(),
       description: z.string().optional(),
-    })
+    }))
     .optional(),
   throws: z
     .array(
@@ -50,6 +50,9 @@ export const DirectorySchema: z.ZodType<{
 );
 
 export type FunctionType = z.infer<typeof FunctionSchema>;
+export type ParamType = z.infer<typeof FunctionSchema>["params"];
+export type ReturnType = z.infer<typeof FunctionSchema>["returns"];
+export type ThrowsType = z.infer<typeof FunctionSchema>["throws"];
 export type FileType = z.infer<typeof FileSchema>;
 export type DirectoryType = z.infer<typeof DirectorySchema>;
 export type Markdown = {
@@ -76,12 +79,12 @@ function generateFunctionMarkdown(func: FunctionType): string {
     markdownContent += "\n";
   }
 
-  // Add returns documentation
-  if (func.returns) {
-    markdownContent += "### Returns:\n";
-    markdownContent += `- **Type**: ${func.returns.type}\n`;
-    markdownContent += `- **Description**: ${func.returns.description ?? ""}\n\n`;
-  }
+  // // Add returns documentation
+  // if (func.returns) {
+  //   markdownContent += "### Returns:\n";
+  //   markdownContent += `- **Type**: ${func.returns.type}\n`;
+  //   markdownContent += `- **Description**: ${func.returns.description ?? ""}\n\n`;
+  // }
 
   // Add throws documentation
   if (func.throws && func.throws.length > 0) {
