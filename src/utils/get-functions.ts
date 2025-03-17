@@ -2,14 +2,16 @@ import { FunctionType, ParamType, ThrowsType } from "./generate-docs";
 
 export function cleanString(str: string) {
   if (!str) return;
-  str = str.replace(/[\r\n]+/g, " ");  // Strip \n and \r
+  str = str.replace(/[\r\n]+/g, " "); // Strip \n and \r
   str = str.replace(/^[\s\-*]+|[\s\-*]+$/g, ""); // Strip leading/trailing spaces, hyphens, and asterisks
   return str;
 }
 
-export const PY_REGEX = /def\s+(\w+)\s*\(.*?\)\s*(?:->\s*[\w\[\], ]+)?\s*:\s*\n\s*(?:(?:"""([\s\S]*?)"""|'''([\s\S]*?)'''))/gs;
+export const PY_REGEX =
+  /def\s+(\w+)\s*\(.*?\)\s*(?:->\s*[\w\[\], ]+)?\s*:\s*\n\s*(?:(?:"""([\s\S]*?)"""|'''([\s\S]*?)'''))/gs;
 
-export const JS_REGEX = /\/\*\*\s*([\s\S]*?)\s*\*\/\s*(export\s+)?(async\s+)?(?:function\s+(\w+)\s*\((.*?)\)(?:\s*:\s*(\S+))?|const\s+(\w+)\s*=\s*(async\s+)?\((.*?)\)(?:\s*:\s*(\S+))?\s*=>|let\s+(\w+)\s*=\s*(async\s+)?\((.*?)\)(?:\s*:\s*(\S+))?\s*=>|var\s+(\w+)\s*=\s*(async\s+)?\((.*?)\)(?:\s*:\s*(\S+))?\s*=>)/gs;
+export const JS_REGEX =
+  /\/\*\*\s*([\s\S]*?)\s*\*\/\s*(export\s+)?(async\s+)?(?:function\s+(\w+)\s*\((.*?)\)(?:\s*:\s*(\S+))?|const\s+(\w+)\s*=\s*(async\s+)?\((.*?)\)(?:\s*:\s*(\S+))?\s*=>|let\s+(\w+)\s*=\s*(async\s+)?\((.*?)\)(?:\s*:\s*(\S+))?\s*=>|var\s+(\w+)\s*=\s*(async\s+)?\((.*?)\)(?:\s*:\s*(\S+))?\s*=>)/gs;
 
 export function extractFunctions(
   content: string,
@@ -41,7 +43,9 @@ export function parseMatch(
   }
 }
 
-export function parsePythonFunction(match: RegExpExecArray): FunctionType | undefined {
+export function parsePythonFunction(
+  match: RegExpExecArray,
+): FunctionType | undefined {
   const name = match[1];
   const docstring = match[2];
 
@@ -103,10 +107,12 @@ export function parsePythonFunction(match: RegExpExecArray): FunctionType | unde
     throws,
     returns,
     docstring,
-  }
+  };
 }
 
-export function parseJSFunction(match: RegExpExecArray): FunctionType | undefined {
+export function parseJSFunction(
+  match: RegExpExecArray,
+): FunctionType | undefined {
   const name = match[4];
   const docstring = match[0];
 
@@ -156,7 +162,7 @@ export function parseJSFunction(match: RegExpExecArray): FunctionType | undefine
     throws,
     returns,
     docstring,
-  }
+  };
 }
 
 export function getFunctions(

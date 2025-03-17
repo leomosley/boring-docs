@@ -14,11 +14,13 @@ export const FunctionSchema = z.object({
       description: z.string().optional(),
     }),
   ),
-  returns: z.array(
-    z.object({
-      type: z.string(),
-      description: z.string().optional(),
-    }))
+  returns: z
+    .array(
+      z.object({
+        type: z.string(),
+        description: z.string().optional(),
+      }),
+    )
     .optional(),
   throws: z
     .array(

@@ -15,9 +15,7 @@ export async function createFile(
 
     await fs.writeFile(filePath, content, "utf8");
     return filePath;
-
   } catch (error) {
     console.error(error);
   }
-
 }
