@@ -64,7 +64,7 @@ export async function runInit(
 
   // Generate docs object
   const generateSpinner = ora(`Generating docs`)?.start();
-  const docs = generateDocs(cwd, info.language);
+  const docs = generateDocs(cwd, info);
 
   if (!docs) throw new Error("Couldn't generate docs");
 

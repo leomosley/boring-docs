@@ -1,6 +1,6 @@
 import { createFile } from "./create-file";
 import { getFiles } from "./get-files";
-import { Language } from "./get-project-info";
+import { ProjectInfo } from "./get-project-info";
 import { z } from "zod";
 import path from "path";
 
@@ -132,9 +132,79 @@ function generateMarkdown(directory: DirectoryType): Markdown[] {
   return markdown;
 }
 
-export async function generateDocs(cwd: string, language: Language) {
-  const files: DirectoryType = getFiles(cwd, language);
-  const markdown = generateMarkdown(files);
+function getTitle(info: ProjectInfo): string {
+  let projectName;
+
+  if (info.name) {
+    projectName = info.name;
+  } else {
+    switch (info.language) {
+      case "js":
+        projectName = "JavaScript Project";
+        break;
+      case "py":
+        projectName = "Python Project";
+        break;
+      case "ts":
+        projectName = "TypeScript Project";
+        break;
+      default:
+        break;
+    }
+  }
+
+  return `# ${projectName}`;
+}
+
+function getDescription(info: ProjectInfo): string {
+  // TODO: Add some kind of generated description if one is not provided. (Gen AI)
+  return info.description ?? "Description";
+}
+
+function getTree(files: DirectoryType, indent: string = ""): string {
+  let tree = "";
+  tree += `${indent}├─── ${path.basename(files.path)}\n`;
+
+  for (const dir of files.children) {
+    tree += getTree(dir, indent + "  ");
+  }
+
+  return tree;
+}
+
+function generateHome(files: DirectoryType, info: ProjectInfo): Markdown {
+  const title = getTitle(info);
+
+  const description = getDescription(info);
+
+  const tree = getTree(files);
+
+  const content =
+    title
+    + "\n\n"
+    + description
+    + "\n\nProject Strucutre\n\n"
+    + "```\n"
+    + tree
+    + "\n```";
+
+  console.log(content);
+
+  return {
+    filename: "home.md",
+    filePath: "",
+    content
+  }
+}
+
+export async function generateDocs(cwd: string, info: ProjectInfo) {
+  const files: DirectoryType = getFiles(cwd, info.language);
+
+  // Generate docs "home" page
+  const home = generateHome(files, info);
+
+  // Generate markdown for projects files
+  const markdown: Markdown[] = [...generateMarkdown(files), home];
 
   for (const { filePath, content, filename } of markdown) {
     await createFile(filename, content, path.join(cwd, "docs", filePath));
