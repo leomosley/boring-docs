@@ -161,12 +161,19 @@ function getDescription(info: ProjectInfo): string {
   return info.description ?? "Description";
 }
 
-function getTree(files: DirectoryType, indent: string = ""): string {
+function getTree(files: DirectoryType, indent: string = "", isLast: boolean = true): string {
   let tree = "";
-  tree += `${indent}├─── ${path.basename(files.path)}\n`;
+  const basename = path.basename(files.path);
+  const prefix = indent.length === 0 ? "" : indent + (isLast ? "└── " : "├── ");
+  tree += `${prefix}${basename}\n`;
 
-  for (const dir of files.children) {
-    tree += getTree(dir, indent + "  ");
+  const children = files.children;
+  const count = children.length;
+  for (let i = 0; i < count; i++) {
+    const child = children[i];
+    const isLastChild = i === count - 1;
+    const newIndent = indent + (isLast ? "    " : "│   ");
+    tree += getTree(child, newIndent, isLastChild);
   }
 
   return tree;
